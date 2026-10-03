@@ -119,13 +119,29 @@ the harm is irreversible the control must be preventive, not detective. **That i
 basis for the split — not sensitivity in the abstract, but whether the damage can be walked
 back.**
 
-**Authorization belongs in the platform because that is what the platform is for.** The brief
-lists authN/authZ among the needs every app shares. Routing permission changes through a
-central queue would leave each team waiting on someone who does not know what
-`insights:read_sensitive` unlocks, and would put three engineers — or worse, an unrelated
-team — in the path of every access decision at twenty-five tenants. Self-service is also the
-only shape whose cost does not grow with tenant count, which is the constraint ADR-1 is built
-around.
+**Authorization is platform-owned because the directory cannot express what a scope means.**
+
+This was the closest call in the design, and the directory alternative is genuinely strong:
+it is zero new software, it already has an approval workflow, and a three-person team should
+be reflexively suspicious of building an access system. We nearly took it.
+
+What decided it is a mismatch in vocabulary. A directory group is a list of people with a
+name. `insights:read_sensitive` is not a name — it is a statement about which columns of
+which dataset become visible, and that fact lives in the tenant manifest, in the warehouse
+grants, and in the app's route declarations. **Mapping group to meaning is platform knowledge
+that the directory has no place to store.** Done there, the mapping lives in a wiki page
+somebody maintains, and the first time it is wrong nobody finds out — because a group that
+grants more than its name suggests looks identical to one that does not.
+
+There is a second-order cost that matters more than it first appears. Two systems means two
+audit trails, and the compliance partner's actual question is not "was there a process" but
+"who authorised this person, and what did they then read". Answered across a directory export
+and a platform log, that is a reconciliation someone performs under pressure during an
+incident. Answered from one append-only store, it is a query.
+
+The honest counterweight: we now own an access system, which is real software on the critical
+path of every tenant. We accepted that, and ADR-5 records that it is the largest unbuilt
+thing here — enforcement is real, issuance is still stubbed.
 
 **The app owner is the right approver.** They know who is on their team, what their data
 means, and who has a reason to see it. A central administrator knows none of those things and
@@ -152,7 +168,7 @@ is proposed, the honest answer is to tighten the second or decline the tenant.
 | Uniform hard isolation | Defensible on security alone; three engineers cannot run 25 stacks, and it defends against a threat this environment does not have |
 | Uniform soft isolation | Adequate for 24 of 25 tenants; fails the compliance review that gates the 25th |
 | Per-tenant negotiated controls | Makes every onboarding a design exercise — the effort-per-tenant cost ADR-1 exists to avoid |
-| Authorization via directory groups | One less system to build, but puts a central queue in the path of every access change and splits the audit trail across two systems at exactly the moment someone asks who approved what |
+| Authorization via directory groups | The strongest alternative, and nearly chosen: no new software, an approval workflow that already exists, and the right instinct for a three-person team. Rejected because a group is a list of people with a name, and a scope is a statement about which columns become visible — the directory has nowhere to hold that mapping, so it ends up in a wiki nobody notices is wrong. Also splits the audit trail in two at exactly the moment someone asks who approved what |
 | Roles rather than scopes | Convenient, but modelling other teams' org charts before they ask is guesswork; revisit when several converge on the same bundle |
 | Separate pages for *every* app | The per-user mount already covers reversible data; charging twenty-four tenants a worse experience for a boundary they do not need is the kind of uniform strictness this design rejects elsewhere |
 | Relying on the access model alone, with no separate page anywhere | Adequate right up until an authorization bug, which on this one dataset is unrecoverable. The second layer costs one tenant some convenience and removes a single-point-of-failure |

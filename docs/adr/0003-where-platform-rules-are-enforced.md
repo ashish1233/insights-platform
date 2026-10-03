@@ -97,6 +97,21 @@ incident and be blamed. Restricting runtime enforcement to authentication, telem
 and data scoping means the platform's hard edges are few enough that the whole team can hold
 them in their heads — which matters more at 3 a.m. than completeness does.
 
+**One of the three does not fit the test, and it is worth saying so.** Authentication and
+data scoping are there because disclosure is irreversible. Tenant-tagged telemetry is not —
+an untagged log line is annoying, not unrecoverable, and by the rule above it belongs in CI
+at most.
+
+It is a runtime gate anyway, for a different reason: **it is the thing every other control is
+evidenced by.** ADR-4's entire operator model — what the platform team may see, what a
+break-glass produced, what the compliance partner reads — assumes every record carries a
+tenant and an acting identity. A gap in that trail is not detectable from inside the trail,
+which is the one failure mode no amount of later checking recovers from.
+
+So the honest statement of the rule is: *irreversible harm earns a runtime gate, and so does
+the evidence that any of this happened.* One exception, named, rather than a test quietly
+stretched to fit three things when it only covers two.
+
 **Keeping `--no-verify` is a considered choice, not an oversight.** The alternative is a tenant
 who cannot ship a hotfix because our secret scanner has a false positive. That tenant will
 remember it, and it will cost more trust than the bypass ever costs in risk — particularly

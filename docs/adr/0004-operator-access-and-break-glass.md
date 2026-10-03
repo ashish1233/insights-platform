@@ -111,6 +111,22 @@ soft-trust posture of ADR-2, and operationally frictionless. Rejected because it
 compliance review that gates People Analytics onboarding, which makes it a non-starter
 regardless of its merits.
 
+**Use the organisation's existing privileged-access tooling instead of building break-glass**
+— most enterprises already run something for exactly this: time-boxed elevation, an approver,
+an audit record. Reusing it would mean no new software, no second approval workflow, and a
+trail security already knows how to read. This is the strongest alternative here and the same
+instinct that nearly won in ADR-2.
+
+Rejected for one reason: that tooling grants access to *systems*, and the thing needing
+constraint here is access to a *dataset belonging to a specific tenant*. "Alice has
+production database access for an hour" is a different, much broader statement than "Alice
+may read the compensation dataset for one hour, approved by its data owner". Mapping one onto
+the other means encoding tenant and dataset semantics into a system that has no concept of
+either — the same vocabulary mismatch that decided ADR-2.
+
+Worth revisiting if that tooling grows per-dataset scoping, or if our break-glass turns out
+to be used rarely enough that the fidelity was not worth the build.
+
 **No operator access to tenant telemetry at all; tenants self-serve their own observability** —
 maximal privacy, and it eliminates this entire problem. Rejected because it makes the platform
 unsupportable: twenty-five teams debugging shared infrastructure through the platform team
