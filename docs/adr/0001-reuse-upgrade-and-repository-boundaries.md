@@ -7,8 +7,10 @@
 > Upgrades are pull, like any dependency: we publish, tenants take it when they want it.
 > The risk that actually matters is not teams running old versions, it is teams
 > *rebuilding* what already exists, so release notes and the hub are written to make new
-> capability findable. Security fixes carry a deadline; missing it costs a tenant their
-> warehouse credentials, never their code.
+> capability findable. Security runs in two steps: we **contain immediately** with the
+> infrastructure we own — tightening warehouse grants, rotating the signing secret — so the
+> hole stops mattering today, then publish the fix with a deadline. Missing it costs a
+> tenant their warehouse credentials, never their code.
 
 ## Context
 
@@ -46,9 +48,33 @@ major and the one before.
 
 **Release notes answer "what can you now delete?"**, not "what did we change?".
 
-**Security is the one exception, and even there we do not touch the code.** Security releases
-carry a severity, the exposure, and a deadline. If the deadline passes, we revoke the
-tenant's warehouse role until they patch.
+**Security is the one exception, and it happens in two steps — contain first, patch second.**
+
+A pull model has an obvious hole: if the fix only lands when each team chooses to take it,
+the vulnerability is live in the meantime. Twelve teams, a week each, is a week of exposure
+while we send polite reminders. That is not acceptable and it is not what happens.
+
+**Step one, immediately, without touching anyone's code.** The bug is in a library we cannot
+reach, but the thing it guards is infrastructure we own. Depending on the hole, we:
+
+- **tighten the warehouse grants** so the data is unreachable even by a caller who gets past
+  the broken check — the backstop ADR-2 exists to provide;
+- **rotate the token signing secret**, which invalidates every token in flight;
+- **stop the identity provider issuing the affected scope** at all.
+
+The bug is still present in twelve apps. It has stopped mattering. This takes minutes and
+needs nobody's cooperation, because every one of these levers is on our side of the line.
+
+**Step two, the actual fix.** We publish the patched version with a severity, a description
+of the exposure, and a deadline, and notify each affected team directly rather than relying
+on them watching a feed. They upgrade and test on their own terms.
+
+**If the deadline passes**, we revoke that tenant's warehouse role until they patch. By then
+this is about removing a known defect rather than stopping active exposure — containment
+already did that — so the deadline can be generous enough that nobody reaches it by accident.
+
+The ordering is the point: **containment is ours and is instant; the fix is theirs and can
+take the time it needs.**
 
 ## Why
 

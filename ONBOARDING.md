@@ -278,13 +278,22 @@ fixes. We can confirm the SDK still works; only you can confirm your numbers are
 still right, and a change that satisfies us and quietly breaks your
 reconciliation is worse than an unpatched library.
 
-**Security fixes come with a deadline.** The PR arrives with a severity, what the
-exposure actually is, and a date. If that date passes with the app unpatched, we
-revoke your warehouse role until it's merged — your app stops reading data rather
-than carrying a known hole.
+**Security works in two steps, and the first may reach you before we do.**
 
-That's a real outage and we don't do it casually; the deadline is set so nobody
-reaches it by accident. But the escalation is deliberately your *access*, not
+If we find a serious hole, we contain it immediately with things on our side of
+the line — tightening warehouse grants, rotating the token signing secret,
+withdrawing a scope. Your app may start refusing requests or failing to read a
+dataset before anyone has called you. That is deliberate: it closes the exposure
+in minutes instead of waiting on a dozen teams to act. We will tell you what
+happened as soon as it is contained, and never later than the same day.
+
+**Then comes the fix**, with a severity, what was exposed, and a date. If that
+date passes with the app unpatched, we revoke your warehouse role until it is —
+your app stops reading data rather than carrying a known hole.
+
+That last step is a real outage and we don't do it casually; by then containment
+has already stopped the bleeding, so the deadline is generous enough that nobody
+reaches it by accident. But the escalation is deliberately your *access*, never
 your code. We'd rather stop your app than silently change what it calculates.
 
 ---
