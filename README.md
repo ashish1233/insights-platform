@@ -160,11 +160,6 @@ independent lifecycle. Reasoning in
 | What can the platform team see and do, and how is that constrained and evidenced? | [ADR-4](docs/adr/0004-operator-access-and-break-glass.md) — metadata by default, break-glass with a second approver for raw data, audit store the platform team cannot edit. |
 | What did you consciously leave out? | [ADR-5](docs/adr/0005-deliberate-omissions.md) — eight omissions, each with a trigger someone could actually check. |
 
-One the brief didn't ask but twenty-five tenants raise on their own:
-**how do twenty-five apps become one product?** —
-[ADR-2](docs/adr/0002-tiered-tenant-isolation.md), where composition follows
-authorization.
-
 One question the brief didn't ask, but twenty-five tenants raise on their own:
 **how do twenty-five apps become one product rather than twenty-five bookmarks?**
 [ADR-2](docs/adr/0002-tiered-tenant-isolation.md) answers it, and reverses
@@ -209,7 +204,7 @@ cd ../insights-sdk-python && uv run pytest -q
 
 **Built** — three stubs, both scaffolds, the UI kit, the hub, and three tenant
 apps: a restricted-tier dashboard, a standard-tier explorer federated into the
-hub, and a scheduled job. 24 tests pass across the SDK and the two tested apps;
+hub, and a scheduled job. 26 tests pass across the SDK and the two tested apps;
 five frontend packages build with no TypeScript errors.
 
 The brief asks for two example apps. The third exists for one reason: the hub
