@@ -122,6 +122,7 @@ they were never holding.
 | Let tenants fork the SDK | Fast for them, and it ends the platform — twelve divergent copies, no upgrade path, and ADR-1's whole model gone |
 | Open contribution with review | Tempting, and it is what large platforms do. Rejected because ADR-3 already concluded three engineers cannot review twenty-five teams' code; a contribution queue is the same bottleneck wearing a different hat |
 | Promote on the author's say-so | Faster than waiting for a second tenant, and it fills the platform with one-team abstractions that nobody else fits. The second tenant is the cheapest available evidence that a thing is general |
+| Let tenants contribute *services* rather than code, routed through a gateway | The richer model — a team could ship anything in any language. Rejected because a contributed class is something to maintain and a contributed service is something to **operate**: health, versioning, rollout, auth propagation, and a page at 3am for code the platform team did not write. It also requires a gateway, which is request-path infrastructure ADR-1 exists to avoid. The gateway and the code-not-services rule are one decision, not two |
 | Decide the agent/AI story now | Designing for an unasked capability produces surface nobody uses. Stating the invariant costs nothing and survives whatever actually gets asked for |
 
 ## Consequences
