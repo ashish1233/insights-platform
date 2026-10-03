@@ -160,12 +160,10 @@ independent lifecycle. Reasoning in
 | What can the platform team see and do, and how is that constrained and evidenced? | [ADR-4](docs/adr/0004-operator-access-and-break-glass.md) — metadata by default, break-glass with a second approver for raw data, audit store the platform team cannot edit. |
 | What did you consciously leave out? | [ADR-5](docs/adr/0005-deliberate-omissions.md) — eight omissions, each with a trigger someone could actually check. |
 
-Two the brief didn't ask but twenty-five tenants raise on their own:
+One the brief didn't ask but twenty-five tenants raise on their own:
 **how do twenty-five apps become one product?** —
 [ADR-2](docs/adr/0002-tiered-tenant-isolation.md), where composition follows
-authorization. And **how does the platform grow past what three engineers can
-build?** — [ADR-6](docs/adr/0006-how-the-platform-grows.md): extension points,
-tenant-local first, promoted when a second tenant needs the same thing.
+authorization.
 
 One question the brief didn't ask, but twenty-five tenants raise on their own:
 **how do twenty-five apps become one product rather than twenty-five bookmarks?**
