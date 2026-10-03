@@ -71,20 +71,21 @@ Unit tests, which cover the same ground in isolation:
 cd ../insights-sdk-python && uv run pytest -q
 ```
 
-**To see the hub**, start the stubs and the two frontends:
+**To see the hub**, one command — it installs what is missing on first run:
 
 ```bash
-(cd stubs/idp && uvicorn idp_stub:app --port 8081) &
-(cd stubs/warehouse && uvicorn warehouse_stub:app --port 8082) &
-(cd stubs/auditlog && uvicorn auditlog_stub:app --port 8083) &
-(cd packages/shell && npm run dev) &                        # :5100
-(cd ../finance-spend-explorer/frontend && npm run dev) &    # :5174
+./scripts/run-hub.sh
 ```
 
-Then open **http://localhost:5100**. The directory lists every app across both
-tenants; a standard-tier card opens the federated remote, and the restricted-tier
-card opens its own origin instead — the visible half of
-[ADR-2](docs/adr/0002-tiered-tenant-isolation.md).
+Then open **http://localhost:5100**.
+
+Sign in with tenant `finance` and any user. The directory shows two apps, and
+**the compensation app is not among them** — that user does not hold
+`insights:read_sensitive`, so it is absent rather than greyed out. Sign in on
+tenant `people-analytics` with that scope and it appears, opening in its own
+origin rather than mounting. That is
+[ADR-2](docs/adr/0002-tiered-tenant-isolation.md) on screen: composition follows
+authorization, and the irreversible dataset keeps a second boundary.
 
 To use it by hand instead: `docker compose up -d` for the stubs, then run either
 example app. Full walkthrough, written for a team joining on day one:
