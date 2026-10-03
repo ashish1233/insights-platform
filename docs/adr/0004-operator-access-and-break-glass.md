@@ -1,7 +1,14 @@
 # ADR-4: Operator access and break-glass
 
-- **Status:** Accepted
-- **Date:** 2026-10-03
+**Status:** Accepted · **Date:** 2026-10-03
+
+> **In short.** Operators see metadata and aggregates by default, never rows — the SDK
+> refuses to put payloads in telemetry, which is the realistic leak. Raw tenant data needs
+> break-glass: time-boxed, reasoned, and second-approved, by the tenant's own data owner
+> where the data is confidential. Records land in a store the platform team cannot edit,
+> run by a different group. We do not claim operator access is impossible — it is not,
+> and a compliance partner would find that claim false in one question. We claim it is
+> narrow by default, and impossible to perform quietly.
 
 ## Context
 

@@ -1,7 +1,14 @@
 # ADR-3: Where platform rules are enforced
 
-- **Status:** Accepted
-- **Date:** 2026-10-03
+**Status:** Accepted · **Date:** 2026-10-03
+
+> **In short.** A rule lives at the cheapest layer where its failure is still
+> *recoverable*. Naming conventions are documentation; a leaked secret is blocked in CI
+> because git history cannot be un-written; authentication, tenant-tagged telemetry and
+> data scoping are runtime gates because disclosure cannot be undone. Exactly three
+> runtime gates, deliberately — each one is surface area three engineers debug at 3am. We
+> do not review tenant application code at all; three people cannot be twenty-five teams'
+> review queue, and the things worth protecting are enforced by code they cannot skip.
 
 ## Context
 

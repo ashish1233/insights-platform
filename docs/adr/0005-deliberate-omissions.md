@@ -1,7 +1,13 @@
 # ADR-5: Deliberate omissions
 
-- **Status:** Accepted
-- **Date:** 2026-10-03
+**Status:** Accepted · **Date:** 2026-10-03
+
+> **In short.** Eight things deliberately unbuilt, each with a trigger someone could
+> actually check — not "when we scale". The largest is the authorization surface ADR-2
+> describes: enforcement is real and tested, issuance is stubbed, and that sequence is
+> deliberate because enforcement is what makes a wrong grant survivable. The most
+> dangerous is manual warehouse grants, which nothing verifies — it sits underneath a
+> guarantee already made to a compliance partner.
 
 ## Context
 
