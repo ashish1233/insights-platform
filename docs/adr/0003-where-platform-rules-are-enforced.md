@@ -8,7 +8,8 @@
 > data scoping are runtime gates because disclosure cannot be undone. Exactly three
 > runtime gates, deliberately — each one is surface area three engineers debug at 3am. We
 > do not review tenant application code at all; three people cannot be twenty-five teams'
-> review queue, and the things worth protecting are enforced by code they cannot skip.
+> review queue. The caveat, spelled out below: the third gate is absolute only on the
+> restricted tier — elsewhere it is scope injection plus a database backstop.
 
 ## Context
 
@@ -71,8 +72,18 @@ Three gates, and deliberately no more:
 1. **Authentication.** No identity, no request. Enforced by SDK middleware.
 2. **Tenant-tagged telemetry.** Every log and audit event carries `tenant_id` and the acting
    identity. Not optional, because ADR-4's entire operator model is built on it.
-3. **Data scoping.** The SDK's data client injects the tenant scope on every query. For
-   restricted-tier tenants this cannot be disabled, and audit is fail-closed.
+3. **Data scoping.** The SDK's data client injects the tenant scope on every query — a
+   caller cannot supply one, and passing `tenant_id` is refused rather than ignored.
+
+   **This gate is not uniform, and the summary above overstates it.** For restricted-tier
+   tenants the per-request scope check is enforced by middleware and cannot be skipped, and
+   audit is fail-closed. For standard-tier tenants the scope *injection* is unavoidable but
+   the per-request *permission* check is an SDK helper a route can simply not call. Their
+   backstop is the warehouse role and the audit trail, by the same reversibility argument
+   that set their tier.
+
+   So it is a hard gate for one tenant and a strong default for the rest — which is the
+   honest description, and a weaker claim than "enforced by code they cannot skip".
 
 *Failure mode:* data disclosed to someone who should not have it. Unrecoverable — once a
 confidential figure has been read, no subsequent action undoes it. This is the only category that

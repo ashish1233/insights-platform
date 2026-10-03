@@ -175,6 +175,11 @@ is a deliberate exception to the self-service principle everywhere else in ADR-1
   signed-in user is authorised for. The restricted tenant additionally keeps its own page,
   as a second boundary on the one dataset that cannot be un-shared.
 
+  The original objection was not wrong and is not retired: a shell *is* infrastructure on the
+  critical path owned by three engineers. ADR-2 now books that explicitly as the one place
+  ADR-1's no-request-path rule is broken, and says what keeps it survivable — every app stays
+  independently runnable at its own URL.
+
   Left visible rather than deleted. A reversed decision, and the reason it reversed, is more
   useful to the next person than a tidy document.
 
@@ -182,13 +187,13 @@ is a deliberate exception to the self-service principle everywhere else in ADR-1
 
 Given another two days, in priority order and for stated reasons:
 
-1. **Grant-drift detection** (item 4) — one day. It closes the gap beneath ADR-2's central
+1. **Grant-drift detection** (item 3) — one day. It closes the gap beneath ADR-2's central
    claim, and it is the only omission here that silently invalidates a guarantee we have made
    to a compliance partner.
 2. **Canary cohort for releases** (item 5) — half a day of policy plus scheduling. Two
    volunteer tenants take each release before it is announced generally, so a bad release is
    caught by one team rather than discovered one at a time over the following month.
-3. **Static SDK usage analysis** (item 3) — two days. It converts the upgrade story from a
+3. **Static SDK usage analysis** (item 4) — two days. It converts the upgrade story from a
    stated intention into something measurable.
 
 Everything else waits for its trigger.

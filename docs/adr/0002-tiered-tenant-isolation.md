@@ -98,10 +98,14 @@ that warrants it.
 
 The two layers fail independently, which is the point:
 
-| If this fails | This still holds |
-|---|---|
-| A scope is granted to the wrong person | The app is still on its own page — nothing *else* in the hub can reach it |
-| An app in the hub behaves badly | The compensation app was never in that page to begin with |
+| If this fails | This still holds | What it does **not** save you from |
+|---|---|---|
+| An app in the hub behaves badly, or a dependency inside it does | The compensation app was never in that page, so there is nothing to reach | — |
+| A scope is granted to the wrong person | Nothing. They can open the app directly | The second boundary stops *lateral* reach between apps; it does not stop a mis-grant. Only the grant record and the audit trail catch that |
+
+Worth stating plainly, because it is tempting to claim the second boundary protects against
+both. It does not. A wrong grant is a detection problem, not an isolation one — which is why
+every grant is recorded next to every access.
 
 Standard-tier apps get the first layer only, because for reversible data the audit trail is a
 sufficient second line and a separate page would cost those tenants convenience for no gain.
@@ -147,11 +151,6 @@ thing here — enforcement is real, issuance is still stubbed.
 means, and who has a reason to see it. A central administrator knows none of those things and
 approves on vibes.
 
-**One audit store is worth more than one approval queue.** The compliance partner's real
-question is not "was there a process" but "who authorised this person, and what did they then
-read". Keeping grants and accesses in the same append-only store makes that a single query
-instead of a reconciliation between two systems.
-
 **Fail-closed audit is a deliberate availability sacrifice, and only in one tier.** An
 unrecorded read of confidential data is worse than an outage: the outage is visible, bounded
 and fixable. We refuse the same trade in the standard tier, where it would turn a telemetry
@@ -191,6 +190,23 @@ is proposed, the honest answer is to tighten the second or decline the tenant.
 - **Residual risk in the hub:** a compromised dependency inside one app could reach data in
   another *for a user who holds both*. That is a supply-chain problem, not an isolation one,
   and the answer is dependency governance rather than architecture. Not addressed today.
+
+### The hub is the exception to ADR-1, and we should say so
+
+ADR-1's whole case against services is that three engineers cannot operate infrastructure on
+the request path, and it is careful that identity, warehouse and audit all sit *off* it — an
+app that has authenticated keeps serving if they are down.
+
+**The hub does not get that defence.** It is on the critical path of every user's experience:
+when it breaks, twenty-five apps look broken. We traded the rule away knowingly, for one
+reason — twenty-five apps at twenty-five URLs is a list of links someone sent you in chat,
+not a platform, and that cost grows with every tenant while the hub's cost does not.
+
+Two things make it survivable. **Every app remains independently runnable at its own URL**,
+so a hub outage degrades navigation rather than removing access — that property is not
+optional and is smoke-tested. And the hub holds no state and makes no decisions: it reads a
+registry and mounts what the token permits, so it cannot be wrong in a way that matters while
+being right about what to show.
 
 ## Revisit when
 

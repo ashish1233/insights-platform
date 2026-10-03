@@ -65,6 +65,17 @@ reach, but the thing it guards is infrastructure we own. Depending on the hole, 
 The bug is still present in twelve apps. It has stopped mattering. This takes minutes and
 needs nobody's cooperation, because every one of these levers is on our side of the line.
 
+**None of them is free, and calling containment costless would be dishonest.** Tightening a
+grant below its normal level breaks legitimate queries — if it did not, the standing grant
+was too wide and ADR-2's backstop was weaker than claimed. Rotating the signing secret logs
+out every user and kills every scheduled job holding a token. Withdrawing a scope disables
+whatever depended on it.
+
+So containment *is* an outage, chosen deliberately: a visible, immediate, reversible one, in
+exchange for closing an exposure the same day instead of waiting a week. The narrowest lever
+that closes the specific hole is the one we reach for, and it is the incident commander's
+call, not an automatic response.
+
 **One honest dependency.** The first of those levers leans on the per-tenant warehouse
 grants, and ADR-5 names those as the weakest point in the whole design — created by hand,
 verified by nothing. So the incident response and the standing isolation guarantee rest on
