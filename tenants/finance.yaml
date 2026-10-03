@@ -1,0 +1,57 @@
+# Finance — a standard-tier tenant, and what most manifests look like.
+#
+# Compare against people-analytics.yaml: no data owner, no fail-closed audit,
+# no dedicated origin, and apps are mounted into the shell rather than linked.
+# That difference is ADR-2 expressed as configuration.
+
+tenant_id: finance
+tier: standard
+
+# Standard tier shares the platform origin and is routed by path. These tenants
+# already share a trust boundary, so a separate host would buy nothing.
+origin: https://insights.example.com
+
+owner: finance-systems
+
+# Scopes this tenant's apps define. The owner grants these to people directly
+# in the platform — no ticket, effective immediately (ADR-2). Descriptions are
+# written for the team lead doing the granting, not for an engineer.
+scopes:
+  insights:read: "See finance spend reporting"
+  export:run:    "Run the nightly spend extract" 
+
+warehouse_role: wh_finance_ro
+warehouse_grants:
+  - dataset: spend
+    row_filter: tenant_id = 'finance'
+
+audit:
+  # Standard tier is fail-open: events buffer locally if the sink is down and
+  # the request proceeds. Turning a telemetry outage into a platform-wide
+  # outage for ordinary reporting data would be a bad trade (ADR-2).
+  fail_closed: false
+
+apps:
+  - id: finance-spend-explorer
+    kind: web
+    repo: finance-spend-explorer
+    # Standard tier: mounted into the shell as a federated remote (ADR-2).
+    remote_url: https://insights.example.com/apps/spend-explorer/remoteEntry.js
+    route: /apps/spend-explorer
+    health: https://insights.example.com/apps/spend-explorer/health
+    required_scope: insights:read
+
+  - id: finance-spend-export
+    kind: job
+    repo: finance-spend-export
+    # Jobs have no UI and are never mounted into the shell, but they do appear
+    # in its directory — with a schedule and last-run state, and no open action.
+    # A platform view that showed only web apps would misrepresent what runs on
+    # it, and roughly half of these tenants ship batch work.
+    #
+    # They run on a service identity whose scopes come from the IdP's
+    # (tenant, service) registry — never from the caller, and never borrowed
+    # from a user (ADR-1).
+    service_principal: spend-export
+    schedule: "0 2 * * *"
+    required_scopes: [insights:read, export:run]

@@ -1,0 +1,25 @@
+[project]
+name = "insights-stub-auditlog"
+version = "0.1.0"
+description = "Append-only audit sink. Development stand-in for the independently operated audit store (ADR-4)."
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    # Imported at startup to compare this sink's accepted fields against the SDK's
+    # AuditEvent, so contract drift fails loudly at boot rather than silently
+    # dropping a field that only matters during an audit.
+    "insights-platform",
+]
+
+# uv resolves the SDK from the repo instead of an index. With plain pip, install
+# the SDK first: pip install -e ../../../insights-sdk-python
+[tool.uv.sources]
+insights-platform = { path = "../../../insights-sdk-python", editable = true }
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["auditlog_stub"]

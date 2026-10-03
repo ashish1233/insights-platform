@@ -1,0 +1,26 @@
+[project]
+name = "insights-stub-warehouse"
+version = "0.1.0"
+description = "Development stand-in for the shared analytical warehouse and one internal REST API."
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    # Not imported at runtime — the warehouse is upstream of the SDK, not a user
+    # of it. Declared so the stub is installed against the same SDK revision the
+    # apps run, which is what keeps `data.py`'s request shape and these handlers
+    # from drifting apart unnoticed.
+    "insights-platform",
+]
+
+# uv resolves the SDK from the repo instead of an index. With plain pip, install
+# the SDK first: pip install -e ../../../insights-sdk-python
+[tool.uv.sources]
+insights-platform = { path = "../../../insights-sdk-python", editable = true }
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["warehouse_stub"]

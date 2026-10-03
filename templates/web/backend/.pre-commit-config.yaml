@@ -1,0 +1,69 @@
+# ADR-3 puts a rule at the cheapest layer where its failure is still
+# recoverable. These two are here because their failures are *not*:
+#
+#   - A secret committed to git is not removable in practice. The credential
+#     must be rotated, and rotation is manual today (ADR-5, item 5). Blocking it
+#     before it lands is the only cheap moment.
+#   - A broken health contract is recoverable in this app but not in ADR-4's
+#     operator view, which only works if all twenty-five apps answer alike. By
+#     the time an operator needs it during an incident, it is too late to fix.
+#
+# `--no-verify` still works and the platform team is not removing it: a team
+# mid-incident needs an escape hatch, and a platform that cannot be bypassed in
+# an emergency gets abandoned during one (ADR-3). The bypass is recorded; that
+# is the actual control.
+#
+# These hooks ship with the template, so a team that has diverged far from it
+# may be running stale versions. Nothing refreshes them automatically (ADR-1 is
+# pull, not push) — hook changes travel in the release notes like everything
+# else, so skim those.
+
+repos:
+  # --- Secret scanning ---------------------------------------------------------
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      # Belt-and-braces with gitleaks, and the one that catches the most common
+      # real mistake: a key file dragged into the repo directory.
+      - id: detect-private-key
+      - id: check-added-large-files
+        args: ["--maxkb=512"]
+      # A committed .env is a secret leak with extra steps.
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  # --- Platform contract -------------------------------------------------------
+  - repo: local
+    hooks:
+      - id: health-contract
+        name: health contract (ADR-3)
+        entry: python scripts/check_health_contract.py app.main:app
+        language: system
+        pass_filenames: false
+        # Run on any source change: the contract can break through an import
+        # error or a shadowed route, not only by editing main.py.
+        files: ^(src/|pyproject\.toml$)
+
+      - id: tests
+        name: pytest
+        entry: pytest -q
+        language: system
+        pass_filenames: false
+        files: ^(src/|tests/)
+        # ADR-3: less a platform rule than what makes ADR-1's pull model
+        # workable — you upgrade on your own schedule, so you need to be able
+        # to tell quickly whether an upgrade broke you.
+
+  # --- Style: convention layer, so it is advisory and fast ----------------------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.7
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+      - id: ruff-format

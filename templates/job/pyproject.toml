@@ -1,0 +1,40 @@
+# TODO(team): rename the project, then this file is largely done.
+[project]
+name = "todo-your-job"
+version = "0.1.0"
+description = "TODO(team): one line about what this job produces and for whom"
+requires-python = ">=3.11"
+
+dependencies = [
+    # ADR-1: a versioned library, not a service. Pin to a major range — the
+    # ADR-1: pinned to a major range. Upgrades are pull — we take a new SDK
+    # when we want what is in it. Security releases carry a deadline, and
+    # missing it costs this app its warehouse role, not its code.
+    "insights-platform>=0.1,<0.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pre-commit>=3.7",
+    "ruff>=0.5",
+]
+
+[project.scripts]
+# So the container and a human run the same entrypoint.
+todo-your-job = "job.main:main_sync"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 88
+src = ["src", "tests"]

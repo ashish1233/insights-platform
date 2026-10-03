@@ -1,0 +1,117 @@
+# Local platform stack.
+#
+#   docker compose up --build
+#
+# Brings up the three stub services that stand in for shared infrastructure. The
+# two example apps are at the bottom, commented out, because they live in sibling
+# repositories that are built and released independently — exactly as a real
+# tenant app would be. Uncomment whichever you are working on.
+#
+# Every service shares INSIGHTS_TOKEN_SECRET. That is the stub's substitute for
+# the corporate IdP's published keys: the IdP signs with it and each app verifies
+# with it. If they ever diverge, apps reject every token with "Signature
+# verification failed", which does not point at the real cause — so it is defined
+# once here, with an override hook, rather than defaulted per service.
+
+x-token-secret: &token-secret
+  INSIGHTS_TOKEN_SECRET: ${INSIGHTS_TOKEN_SECRET:-dev-only-insecure-secret-replaced-by-the-idp-in-any-real-deployment}
+
+# Apps reach the stubs by service name on the compose network. The SDK's defaults
+# (config.py) point at localhost, which is right when you run a service directly
+# and wrong inside a container, so every app entry sets these explicitly.
+x-platform-urls: &platform-urls
+  INSIGHTS_IDP_URL: http://idp:8081
+  INSIGHTS_WAREHOUSE_URL: http://warehouse:8082
+  INSIGHTS_AUDIT_URL: http://auditlog:8083
+
+services:
+  # ---------------------------------------------------------------- stubs ----
+  idp:
+    build:
+      # Context is the repo root, not stubs/idp: the image needs the SDK source
+      # from ../insights-sdk-python, which is outside the stub's own directory.
+      context: .
+      dockerfile: stubs/idp/Dockerfile
+    container_name: insights-idp
+    ports:
+      - "8081:8081"
+    environment:
+      <<: *token-secret
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8081/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  warehouse:
+    build:
+      context: .
+      dockerfile: stubs/warehouse/Dockerfile
+    container_name: insights-warehouse
+    ports:
+      - "8082:8082"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8082/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  auditlog:
+    build:
+      context: .
+      dockerfile: stubs/auditlog/Dockerfile
+    container_name: insights-auditlog
+    ports:
+      - "8083:8083"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8083/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    # No volume. The stub's store is in-memory and a restart loses it, which is
+    # the correct amount of durability for a fake. Faking persistence here would
+    # invite someone to treat this as the real append-only store (ADR-4), which
+    # is operated by a different team and is not ours to simulate convincingly.
+
+  # ----------------------------------------------------------- example apps ----
+  # Sibling repositories, expected one level up from this file. Uncomment to run
+  # them against the stubs above.
+  #
+  # Both build from the workspace root so their images can also COPY
+  # insights-platform/../insights-sdk-python; adjust `dockerfile` to match whatever
+  # path each repo actually uses.
+
+  # dashboard:
+  #   build:
+  #     context: ..
+  #     dockerfile: people-analytics-dashboard/Dockerfile
+  #   container_name: people-analytics-dashboard
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     <<: [*token-secret, *platform-urls]
+  #     INSIGHTS_TENANT_ID: people-analytics
+  #     # Tier is assigned by the platform, never self-selected (ADR-2). Compose
+  #     # is the platform here, which is why it is set at this layer and not in
+  #     # the app's own config.
+  #     INSIGHTS_TIER: restricted
+  #   depends_on:
+  #     idp: { condition: service_healthy }
+  #     warehouse: { condition: service_healthy }
+  #     auditlog: { condition: service_healthy }
+
+  # export-job:
+  #   build:
+  #     context: ..
+  #     dockerfile: finance-spend-export/Dockerfile
+  #   container_name: finance-spend-export
+  #   ports:
+  #     - "8090:8090"
+  #   environment:
+  #     <<: [*token-secret, *platform-urls]
+  #     INSIGHTS_TENANT_ID: finance
+  #     INSIGHTS_TIER: standard
+  #   depends_on:
+  #     idp: { condition: service_healthy }
+  #     warehouse: { condition: service_healthy }
+  #     auditlog: { condition: service_healthy }

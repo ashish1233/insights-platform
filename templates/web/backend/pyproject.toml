@@ -1,0 +1,38 @@
+# TODO(team): rename the project, then this file is largely done.
+[project]
+name = "todo-your-app"
+version = "0.1.0"
+description = "TODO(team): one line about what this app reports on"
+requires-python = ">=3.11"
+
+dependencies = [
+    # ADR-1: the platform is a versioned library you depend on, not a service
+    # on your request path. Pin to a major range, not an exact version — the
+    # ADR-1: pinned to a major range. Upgrades are pull — we take a new SDK
+    # when we want what is in it. Security releases carry a deadline, and
+    # missing it costs this app its warehouse role, not its code.
+    "insights-platform>=0.1,<0.2",
+    "uvicorn[standard]>=0.29",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pre-commit>=3.7",
+    "ruff>=0.5",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 88
+src = ["src", "tests"]

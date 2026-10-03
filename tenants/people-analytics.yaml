@@ -1,0 +1,52 @@
+# People Analytics — the platform's only restricted-tier tenant.
+#
+# Everything unusual about this file is a consequence of one fact: compensation
+# disclosure cannot be walked back. See ADR-2.
+
+tenant_id: people-analytics
+tier: restricted
+
+# Its own host, not a path under the shared origin. The browser's isolation
+# boundary is scheme + host + port; a path would isolate nothing (ADR-2).
+origin: https://pa.insights.example.com
+
+owner: people-analytics-leads
+# Restricted tier has a named data owner because they, not the platform team,
+# approve break-glass access to this tenant's data (ADR-4).
+data_owner: head-of-people-analytics
+
+# Scopes this tenant's apps define. `requires_second_approver` marks the ones
+# that unlock confidential data: the owner alone cannot grant them, the named
+# data_owner above must approve too (ADR-2, matching ADR-4's break-glass rule).
+scopes:
+  insights:read:
+    description: "See headcount and org reporting"
+  insights:read_sensitive:
+    description: "See compensation figures"
+    requires_second_approver: true
+
+# The backstop beneath the SDK's query scoping. Column grants are the mechanism
+# that makes "preventive, not detective" true for the most confidential fields (ADR-2).
+warehouse_role: wh_people_analytics_ro
+warehouse_grants:
+  - dataset: compensation
+    columns: [employee_id, department, level, base_salary, bonus_target_pct, currency, effective_year]
+    row_filter: tenant_id = 'people-analytics'
+
+audit:
+  # Fail-closed: if the access cannot be recorded, the access does not happen.
+  # An unrecorded read is worse than an outage.
+  fail_closed: true
+  # The compliance partner reads this tenant's audit slice without going
+  # through the platform team (ADR-4).
+  standing_reader: compliance-partner-people
+
+apps:
+  - id: people-analytics-dashboard
+    kind: web
+    repo: people-analytics-dashboard
+    # No remote_url. A restricted app is never mounted into the shell; the
+    # shell renders a link card to this origin instead (ADR-2).
+    href: https://pa.insights.example.com/
+    health: https://pa.insights.example.com/health
+    required_scope: insights:read_sensitive

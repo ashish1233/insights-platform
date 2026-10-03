@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+.eggs/
+build/
+dist/
+sdist/
+wheels/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Environments
+.venv/
+venv/
+env/
+.env
+!.env.example
+
+# Node
+node_modules/
+*.tsbuildinfo
+.vite/
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store
+*.swp
+*~
+
+# Tooling session artifacts
+.claude/

@@ -1,0 +1,594 @@
+/*
+ * Shell arrangement only.
+ *
+ * The shell draws no components of its own. Cards, grids, section headings,
+ * badges, the two-column split and the carousel all come from the ui-kit — if
+ * something here starts to look like a component, it belongs there instead,
+ * because cross-app reuse is the whole premise of the platform. What is left
+ * below is the handful of page-specific arrangements and the three or four
+ * small affordances (a chip, a keyboard hint, a status dot) that only the hub
+ * has.
+ *
+ * Every value is a ui-kit token, so the hub and the apps inside it move
+ * together when the kit changes.
+ *
+ * Plain class names rather than CSS modules, deliberately: these selectors sit
+ * on the host origin alongside every remote's styles, and `shell-` is a prefix
+ * a reviewer can grep for.
+ *
+ * Note what is NOT here any more: a `.shell-app-shell > main { max-width }`
+ * rule reaching into the kit's internals from outside. `AppShell` takes a
+ * `maxWidth` prop now, which is the supported way to say the same thing.
+ */
+
+/* Page frames -------------------------------------------------------------- */
+
+/*
+ * Both routes are full width — there is no navigation rail anywhere.
+ *
+ * On the hub it duplicated the directory beneath it. On `/apps/:id` it spent
+ * 240px of a tenant's canvas on something the header's "← All applications"
+ * link already does. The shell's job is chrome, session and routing; the app
+ * is the content.
+ */
+.shell-layout-plain {
+  display: block;
+}
+
+.shell-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ins-space-xl);
+}
+
+.shell-home {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ins-space-xxl);
+}
+
+/* Status strip ------------------------------------------------------------- */
+
+/*
+ * Healthy is one calm line, not a banner. A green banner announcing that
+ * nothing has happened is furniture the daily reader scrolls past forever, and
+ * it would be sitting in the best space on the page. Genuine problems render an
+ * Alert from the kit instead — see StatusBanner.
+ *
+ * No rule under it. The page's rhythm comes from surfaces changing — tinted
+ * page, white announcement panel, sunken directory panel — so this line sits
+ * bare on the page background and the eye finds the next section by its
+ * surface rather than by a border.
+ */
+.shell-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--ins-space-sm) var(--ins-space-xl);
+}
+
+.shell-status-state {
+  display: flex;
+  align-items: center;
+  gap: var(--ins-space-sm);
+}
+
+.shell-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--ins-radius-pill);
+  background-color: var(--ins-color-success);
+  flex-shrink: 0;
+}
+
+.shell-status-list {
+  margin: 0;
+  padding-left: var(--ins-space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ins-space-xs);
+}
+
+/* Announcements ------------------------------------------------------------ */
+
+/* White panel, first beat of the page's surface rhythm. */
+.shell-announcements {
+  padding: var(--ins-space-xl);
+  background-color: var(--ins-color-surface);
+  border-radius: var(--ins-radius-lg);
+  box-shadow: var(--ins-elevation-sm);
+}
+
+.shell-ann {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ins-space-xl);
+}
+
+/*
+ * The mark is fixed-size and never grows. It is an aid to recognising a slide
+ * you have paged past before, not an illustration the panel is built around —
+ * the moment it gets bigger than this the panel is a hero, which is the one
+ * thing this page is not allowed to have.
+ */
+.shell-ann-figure {
+  flex: 0 0 auto;
+  width: 88px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--ins-color-surface-muted);
+  border-radius: var(--ins-radius-lg);
+}
+
+.shell-ann-art {
+  width: 64px;
+  height: 64px;
+}
+
+.shell-ann-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ins-space-xs);
+}
+
+.shell-ann-meta {
+  margin-bottom: var(--ins-space-xxs);
+}
+
+.shell-ann-text {
+  max-width: 74ch;
+}
+
+.shell-ann-body .shell-link {
+  margin-top: var(--ins-space-sm);
+  align-self: flex-start;
+}
+
+@media (max-width: 640px) {
+  .shell-ann {
+    flex-direction: column;
+    gap: var(--ins-space-lg);
+  }
+}
+
+/* Directory ---------------------------------------------------------------- */
+
+/*
+ * The sunken panel the white cards sit on — second beat of the surface rhythm,
+ * and the thing that makes a borderless card legible as an object. On the page
+ * background alone a white card is nearly invisible; on this it reads
+ * immediately, with no outline drawn anywhere.
+ */
+.shell-directory {
+  display: block;
+  padding: var(--ins-space-xl);
+  background-color: var(--ins-color-surface-sunken);
+  border-radius: var(--ins-radius-lg);
+}
+
+@media (max-width: 640px) {
+  .shell-directory {
+    padding: var(--ins-space-lg);
+  }
+}
+
+/*
+ * The gap between "Your apps" and "Other teams" is larger than the gap inside
+ * either, which is the only thing telling a reader they are two groups.
+ * Spacing does the work; nothing is boxed.
+ */
+.shell-group + .shell-group {
+  margin-top: var(--ins-space-xxl);
+}
+
+.shell-search {
+  position: relative;
+  min-width: 260px;
+}
+
+/* Room for the `/` hint, so a long query never slides under it. */
+.shell-search input {
+  padding-right: var(--ins-space-xxl);
+}
+
+.shell-kbd {
+  position: absolute;
+  right: var(--ins-space-sm);
+  top: 50%;
+  transform: translateY(-50%);
+
+  min-width: 18px;
+  padding: 1px var(--ins-space-xs);
+  text-align: center;
+
+  font-family: var(--ins-font-family-mono);
+  font-size: var(--ins-font-size-xs);
+  color: var(--ins-color-text-muted);
+
+  background-color: var(--ins-color-surface-muted);
+  border: 1px solid var(--ins-color-border);
+  border-radius: var(--ins-radius-sm);
+  pointer-events: none;
+}
+
+.shell-result-count {
+  margin-bottom: var(--ins-space-md);
+}
+
+.shell-mono {
+  font-family: var(--ins-font-family-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * A card's metadata is two stacked rows: what the app is, then how it is doing.
+ * Keeping them apart stops the status clause wrapping into the identity one,
+ * which stranded a separator at the start of a line.
+ */
+.shell-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ins-space-xs);
+}
+
+/* Recently viewed ---------------------------------------------------------- */
+
+.shell-recent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ins-space-sm);
+  margin-bottom: var(--ins-space-xxl);
+}
+
+.shell-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ins-space-sm);
+}
+
+.shell-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ins-space-sm);
+  padding: var(--ins-space-sm) var(--ins-space-lg);
+
+  color: var(--ins-color-text);
+  text-decoration: none;
+
+  background-color: var(--ins-color-surface);
+  border: none;
+  border-radius: var(--ins-radius-pill);
+  box-shadow: var(--ins-elevation-sm);
+}
+
+.shell-chip:hover {
+  color: var(--ins-color-primary);
+  box-shadow: var(--ins-elevation-md);
+}
+
+.shell-chip:focus-visible {
+  outline: 2px solid var(--ins-color-focus-ring);
+  outline-offset: 2px;
+}
+
+.shell-chip-arrow {
+  color: var(--ins-color-text-muted);
+}
+
+/* Side column -------------------------------------------------------------- */
+
+/*
+ * The side column's panels have no border and no surface of their own. They sit
+ * on the page background with a heading and whitespace holding them apart —
+ * boxing them would make a weekly read look as urgent as the directory.
+ */
+.shell-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.shell-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.shell-feed-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ins-space-xxs);
+  padding: var(--ins-space-lg) 0;
+}
+
+.shell-feed-item + .shell-feed-item {
+  border-top: 1px solid var(--ins-color-border);
+}
+
+.shell-feed-item:first-child {
+  padding-top: 0;
+}
+
+.shell-feed-item:last-child {
+  padding-bottom: 0;
+}
+
+.shell-feed-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ins-space-sm);
+  flex-wrap: wrap;
+}
+
+/*
+ * The "what to do" line is the part of a release note that earns its space, so
+ * it gets the brand tint rather than a neutral grey one. That is consistent
+ * rather than decorative: magenta means *action* everywhere else on the page,
+ * and this is the only sentence in the panel that asks for any. The tint is
+ * pale enough that it could not be mistaken for a status.
+ */
+.shell-feed-action {
+  margin-top: var(--ins-space-sm);
+  padding: var(--ins-space-md);
+  background-color: var(--ins-color-primary-surface);
+  border-radius: var(--ins-radius-md);
+}
+
+.shell-feed-deadline {
+  display: flex;
+  align-items: center;
+  gap: var(--ins-space-sm);
+  margin-top: var(--ins-space-xs);
+}
+
+.shell-steps {
+  margin: 0;
+  padding-left: var(--ins-space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ins-space-lg);
+  color: var(--ins-color-text);
+  font-family: var(--ins-font-family-sans);
+  font-size: var(--ins-font-size-sm);
+}
+
+.shell-steps li::marker {
+  color: var(--ins-color-text-muted);
+  font-weight: var(--ins-font-weight-semibold);
+}
+
+.shell-steps li > * + * {
+  margin-top: var(--ins-space-xxs);
+}
+
+.shell-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ins-space-lg);
+}
+
+/* Shared affordances ------------------------------------------------------- */
+
+/*
+ * The one small-caps treatment on the page, used for a label that has to be
+ * findable without competing with the heading above it.
+ */
+.shell-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ins-color-text-muted);
+}
+
+/*
+ * The one solid primary action in the shell — filled magenta, white text, and
+ * an arrow saying where it goes. Used on `/apps/:id` for the restricted app's
+ * only way in, which is the single most important control on that page.
+ * Measured 6.3:1 white-on-fill, so it is legible rather than nearly so.
+ */
+.shell-open {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ins-space-sm);
+  padding: var(--ins-space-sm) var(--ins-space-xl);
+  min-height: 36px;
+  box-sizing: border-box;
+
+  font-family: var(--ins-font-family-sans);
+  font-size: var(--ins-font-size-md);
+  font-weight: var(--ins-font-weight-medium);
+  color: var(--ins-color-text-inverse);
+  text-decoration: none;
+
+  background-color: var(--ins-color-primary);
+  border-radius: var(--ins-radius-md);
+  transition: background-color 120ms ease;
+}
+
+.shell-open:hover {
+  background-color: var(--ins-color-primary-hover);
+}
+
+.shell-open:active {
+  background-color: var(--ins-color-primary-active);
+}
+
+.shell-open:focus-visible {
+  outline: 2px solid var(--ins-color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell-open {
+    transition: none;
+  }
+}
+
+.shell-link,
+.shell-link-inline {
+  color: var(--ins-color-primary);
+  font-weight: var(--ins-font-weight-medium);
+  text-decoration: none;
+}
+
+.shell-link {
+  display: inline-block;
+  font-size: var(--ins-font-size-sm);
+}
+
+.shell-link-inline {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.shell-link:hover,
+.shell-link-inline:hover {
+  color: var(--ins-color-primary-hover);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.shell-link:focus-visible,
+.shell-link-inline:focus-visible {
+  outline: 2px solid var(--ins-color-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--ins-radius-sm);
+}
+
+/* Nav — `/apps/:id` only ---------------------------------------------------- */
+
+.shell-nav {
+  position: sticky;
+  top: var(--ins-space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ins-space-xxs);
+  padding: var(--ins-space-sm);
+  background-color: var(--ins-color-surface);
+  border-radius: var(--ins-radius-lg);
+  box-shadow: var(--ins-elevation-sm);
+}
+
+@media (max-width: 860px) {
+  .shell-nav {
+    position: static;
+  }
+}
+
+.shell-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ins-space-xxs);
+}
+
+.shell-nav-home,
+.shell-nav-item {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ins-space-xxs);
+  padding: var(--ins-space-sm) var(--ins-space-md);
+  text-align: left;
+  text-decoration: none;
+  font-family: var(--ins-font-family-sans);
+  font-size: var(--ins-font-size-sm);
+  color: var(--ins-color-text);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--ins-radius-md);
+  cursor: pointer;
+}
+
+.shell-nav-home:hover,
+.shell-nav-item:hover {
+  background-color: var(--ins-color-surface-muted);
+}
+
+.shell-nav-home:focus-visible,
+.shell-nav-item:focus-visible {
+  outline: 2px solid var(--ins-color-focus-ring);
+  outline-offset: 2px;
+}
+
+/*
+ * The active item takes the brand colour — a tinted surface and magenta text,
+ * no outline. It is the one place in the rail where colour is spent, which is
+ * what makes "you are here" readable at a glance in a list of twenty-five.
+ */
+.shell-nav-home[aria-current='page'],
+.shell-nav-item[aria-current='page'] {
+  background-color: var(--ins-color-primary-surface);
+  color: var(--ins-color-primary);
+  font-weight: var(--ins-font-weight-semibold);
+}
+
+.shell-nav-home {
+  font-weight: var(--ins-font-weight-semibold);
+  margin-bottom: var(--ins-space-xs);
+}
+
+.shell-nav-item-title,
+.shell-nav-item-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ins-space-sm);
+}
+
+/* Status dots in the nav mark exceptions only — see HealthDot. */
+.shell-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--ins-radius-pill);
+  flex-shrink: 0;
+}
+
+.shell-dot-warning {
+  background-color: var(--ins-color-warning);
+}
+
+.shell-dot-danger {
+  background-color: var(--ins-color-danger);
+}
+
+/* Diagnostics — `/apps/:id` only -------------------------------------------- */
+
+.shell-diagnostics {
+  display: flex;
+  align-items: center;
+  gap: var(--ins-space-sm);
+  flex-wrap: wrap;
+  padding: var(--ins-space-sm) var(--ins-space-md);
+  background-color: var(--ins-color-surface-sunken);
+  border-radius: var(--ins-radius-md);
+}
+
+.shell-diagnostics code {
+  font-family: var(--ins-font-family-mono);
+  font-size: var(--ins-font-size-xs);
+}
+
+.shell-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

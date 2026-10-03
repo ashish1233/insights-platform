@@ -1,0 +1,24 @@
+[project]
+name = "insights-stub-idp"
+version = "0.1.0"
+description = "Development stand-in for corporate SSO. Mints platform tokens using the SDK's signer."
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    # The stub must sign tokens with exactly the SDK's claim set and algorithm,
+    # so it depends on the SDK rather than re-implementing issue_token.
+    "insights-platform",
+]
+
+# uv resolves the SDK from the repo instead of an index. With plain pip, install
+# the SDK first: pip install -e ../../../insights-sdk-python
+[tool.uv.sources]
+insights-platform = { path = "../../../insights-sdk-python", editable = true }
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["idp_stub"]
