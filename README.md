@@ -79,6 +79,13 @@ cd ../insights-sdk-python && uv run pytest -q
 
 Then open **http://localhost:5100**.
 
+> One detail worth knowing if you run the pieces by hand: the federated app is
+> **built and previewed**, not started with `vite dev`. Vite's dev server does
+> not emit `remoteEntry.js` — it answers that path with the SPA fallback, so the
+> hub's dynamic import receives HTML and fails. `run-hub.sh` does the build for
+> you; running `npm run dev` in `finance-spend-explorer/frontend` instead will
+> leave the hub unable to mount it.
+
 Sign in with tenant `finance` and any user. The directory shows two apps, and
 **the compensation app is not among them** — that user does not hold
 `insights:read_sensitive`, so it is absent rather than greyed out. Sign in on

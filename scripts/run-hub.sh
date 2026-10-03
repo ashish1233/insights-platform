@@ -109,7 +109,15 @@ curl -sf -o /dev/null localhost:8000/health && ok "dashboard API on :8000" \
   || { printf '  ✗ dashboard API failed:\n'; tail -12 "$LOGS/dashboard-api.log" | sed 's/^/      /'; exit 1; }
 
 start "hub"                5100 bash -c "cd '$HERE/packages/shell' && npm run dev"
-start "spend explorer"     5174 bash -c "cd '$ROOT/finance-spend-explorer/frontend' && npm run dev"
+# The remote is BUILT and previewed, not run in dev mode. Vite's dev server does
+# not emit `remoteEntry.js` — it answers that path with the SPA fallback, so the
+# hub's dynamic import receives HTML and fails. `vite preview` serves the real
+# build output. This is a property of module federation under Vite, not a
+# workaround for anything in this repo.
+printf '  building the spend explorer for federation… '
+(cd "$ROOT/finance-spend-explorer/frontend" && npm run build >/dev/null 2>&1) \
+  && echo done || die "spend explorer build failed"
+start "spend explorer"     5174 bash -c "cd '$ROOT/finance-spend-explorer/frontend' && npm run preview -- --port 5174 --strictPort"
 start "compensation app"   5173 bash -c "cd '$ROOT/people-analytics-dashboard/frontend' && npm run dev"
 
 say "ready"
