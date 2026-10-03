@@ -108,6 +108,7 @@ export function App() {
               <HomePage
                 homeTenant={homeTenant}
                 subject={subject}
+                scopes={auth.session?.scopes ?? []}
                 recent={recent}
                 navigate={navigate}
                 onOpened={record}

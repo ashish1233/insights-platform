@@ -17,6 +17,8 @@ export interface HomePageProps {
    * someone something they could read two inches higher.
    */
   subject: string;
+  /** Scopes from the signed-in token; the directory shows only what they cover. */
+  scopes: readonly string[];
   recent: RegisteredApp[];
   navigate: (path: string) => void;
   onOpened: (appId: string) => void;
@@ -53,6 +55,7 @@ export interface HomePageProps {
  */
 export function HomePage({
   homeTenant,
+  scopes,
   recent,
   navigate,
   onOpened,
@@ -87,7 +90,7 @@ export function HomePage({
         asideWidth="340px"
       >
         <RecentApps apps={shortcuts} onOpened={onOpened} />
-        <AppDirectory homeTenant={homeTenant} onOpened={onOpened} />
+        <AppDirectory homeTenant={homeTenant} scopes={scopes} onOpened={onOpened} />
       </SplitColumns>
     </div>
   );

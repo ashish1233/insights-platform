@@ -37,7 +37,29 @@ and a public platform does not.
 business day, or a second noisy-neighbour incident occurs after the first has been discussed.
 The second incident is the real signal: one is an accident, two is a structural gap.
 
-### 2. Automated warehouse grant provisioning
+### 2. The authorization surface itself
+
+**Not built.** ADR-2 says an app owner grants and revokes scopes in the platform. There is no
+grant store, no API and no UI. Scope *enforcement* is real — middleware refuses a caller
+lacking the declared scope, and the hub shows only apps whose scope the user holds — but
+issuance is stubbed: the development identity provider mints whatever a caller asks for, and
+says so in its own docstring.
+
+**Why not.** It is the largest single piece of software in the design and the one that most
+needs to be got right. Building a half-version in the remaining time would have produced a
+grant store with no approval path, no revocation audit, and no second-approver rule — all
+three of which ADR-2 commits to. An honest gap beats a surface that looks finished and
+quietly isn't.
+
+**This is the biggest unbuilt thing here**, and the ordering matters: enforcement first,
+issuance second, is the right sequence, because enforcement is what makes a wrong grant
+survivable.
+
+**Trigger.** The first real tenant. There is no version of onboarding a team that works
+without it — until then access is set by hand, which is fine for two demo tenants and
+nothing beyond.
+
+### 3. Automated warehouse grant provisioning
 
 **Not built.** The per-tenant warehouse roles that back ADR-2's isolation are created and
 maintained by hand.
@@ -55,7 +77,7 @@ comes first. An interim mitigation — a read-only job that diffs actual grants 
 tier and alerts on divergence — is roughly a day of work and should be done well before the
 full provisioning system is justified.
 
-### 3. SDK API usage telemetry
+### 4. SDK API usage telemetry
 
 **Not built.** We do not know which tenants call which SDK functions.
 
@@ -73,7 +95,7 @@ to tell us who would have been affected.
 "who does this affect?". Static analysis across tenant repos is the cheaper half-measure and
 should be built then — roughly two days, no runtime component, nothing tenants can object to.
 
-### 4. Per-tenant staging environments
+### 5. Per-tenant staging environments
 
 **Not built.** Tenants have local development and production. There is no shared pre-production
 environment the platform team can deploy an upgrade into first.
@@ -93,7 +115,7 @@ is probably not twenty-five environments but a canary cohort — two volunteer t
 each release first, with a bake period before the remaining PRs open. That is a day of policy
 and scheduling rather than an estate of environments, and it scales flat as tenants grow.
 
-### 5. Secrets rotation automation
+### 6. Secrets rotation automation
 
 **Not built.** Credentials are issued at onboarding and rotated manually on request.
 
@@ -103,7 +125,7 @@ that manual rotation is unreliable. At five tenants it is a calendar reminder.
 **Trigger.** Ten tenants, or any credential exposure incident. An exposure makes manual
 rotation a liability immediately, regardless of count.
 
-### 6. Cost attribution and chargeback
+### 7. Cost attribution and chargeback
 
 **Not built.** We cannot say what any given tenant costs to run.
 
@@ -113,7 +135,7 @@ dashboard nobody reads.
 **Trigger.** Finance asks, or the platform's own budget comes under review — at which point
 being unable to attribute cost becomes the platform team's problem rather than an abstraction.
 
-### 7. Self-service tier assignment
+### 8. Self-service tier assignment
 
 **Not built, and deliberately so.** Tier is assigned by the platform team, not chosen by
 tenants.
@@ -154,10 +176,10 @@ is a deliberate exception to the self-service principle everywhere else in ADR-1
 
 Given another two days, in priority order and for stated reasons:
 
-1. **Grant-drift detection** (item 2) — one day. It closes the gap beneath ADR-2's central
+1. **Grant-drift detection** (item 4) — one day. It closes the gap beneath ADR-2's central
    claim, and it is the only omission here that silently invalidates a guarantee we have made
    to a compliance partner.
-2. **Canary cohort for releases** (item 4) — half a day of policy plus scheduling. Two
+2. **Canary cohort for releases** (item 5) — half a day of policy plus scheduling. Two
    volunteer tenants take each release before it is announced generally, so a bad release is
    caught by one team rather than discovered one at a time over the following month.
 3. **Static SDK usage analysis** (item 3) — two days. It converts the upgrade story from a

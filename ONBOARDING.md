@@ -144,6 +144,11 @@ deciding whether a colleague should have it, not an engineer reading your code.
 effect immediately. We mint tokens carrying exactly what you granted, and the
 platform enforces it on every request — your app doesn't have to.
 
+> **Not built yet.** Enforcement is real; the granting surface is not. Today the
+> development identity provider issues whatever scopes you ask it for, which is
+> enough to exercise your app's behaviour locally. Ask us and we'll set real
+> grants up by hand until the self-service surface exists.
+
 **Everything is recorded.** Grants, revocations and the data accesses that follow
 all land in the same audit log. When someone asks "who gave them access, and what
 did they look at", that's one question with one answer, not a reconciliation

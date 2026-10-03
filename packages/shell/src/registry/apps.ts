@@ -41,6 +41,17 @@ export type AppKind = 'web' | 'job';
 interface RegistryEntryBase {
   /** Stable id. Also the shell's route segment: `#/app/<id>`. */
   id: string;
+  /**
+   * The scope a user must hold for this app to appear at all, copied from
+   * `required_scope:` in the tenant manifest.
+   *
+   * This is what makes composing apps into one page safe (ADR-2): the hub
+   * renders only what the signed-in user is authorised for, so a page never
+   * contains an app its viewer could not already open directly. Filtering here
+   * is presentation, not enforcement — the app's own backend refuses the call
+   * regardless — but it is what keeps the shared page honest.
+   */
+  requiredScope: string;
   name: string;
   description: string;
   tenant: string;
@@ -164,6 +175,7 @@ export type RegisteredApp = StandardApp | RestrictedApp | ScheduledJob;
 const REGISTRY = [
   {
     id: 'finance-spend-explorer',
+    requiredScope: 'insights:read',
     name: 'Spend Explorer',
     description: 'Spend by cost centre and period.',
     tenant: 'finance',
@@ -179,6 +191,7 @@ const REGISTRY = [
   },
   {
     id: 'finance-spend-export',
+    requiredScope: 'insights:read',
     name: 'Spend Export',
     description: 'Nightly spend extract to the finance data drop.',
     tenant: 'finance',
@@ -199,6 +212,7 @@ const REGISTRY = [
   },
   {
     id: 'people-analytics-dashboard',
+    requiredScope: 'insights:read_sensitive',
     name: 'Compensation Insights',
     description: 'Compensation reporting. Opens in its own origin.',
     tenant: 'people-analytics',
@@ -213,6 +227,21 @@ const REGISTRY = [
 ] as const satisfies readonly RegisteredApp[];
 
 export const APPS: readonly RegisteredApp[] = REGISTRY;
+
+/**
+ * The apps a given set of scopes may see.
+ *
+ * ADR-2 argues that composing tenant apps into one page is safe because the
+ * page only ever contains what its viewer is already entitled to open. That
+ * argument is only true if something actually filters — this is it.
+ *
+ * Presentation only. The app's own backend enforces the same scope on every
+ * request and would refuse a caller who reached it another way; hiding a card
+ * is a courtesy, not a control.
+ */
+export function visibleTo(scopes: readonly string[]): RegisteredApp[] {
+  return REGISTRY.filter((app) => scopes.includes(app.requiredScope));
+}
 
 export type AppId = (typeof REGISTRY)[number]['id'];
 

@@ -135,7 +135,7 @@ export const ANNOUNCEMENTS: readonly Announcement[] = [
     tone: 'attention',
     link: {
       label: 'SDK 0.4 release notes',
-      href: 'https://github.com/example/insights-platform/tree/main/packages/sdk-python',
+      href: 'https://github.com/example/insights-sdk-python',
     },
   },
 ];

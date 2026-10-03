@@ -78,7 +78,7 @@ operator's screen is a well-meant log statement, not a malicious query. Log
 walked back:
 
 - **Secret scanning** — a credential in git history has to be rotated, not
-  deleted, and rotation is manual today (ADR-5 item 5).
+  deleted, and rotation is manual today (ADR-5 item 6).
 - **Job-contract conformance** (`scripts/check_job_contract.py`) — ADR-3 asks
   for health-contract conformance in CI so that ADR-4's operator view works
   across every app. A job has no `/health` to poll, so the equivalent assertion

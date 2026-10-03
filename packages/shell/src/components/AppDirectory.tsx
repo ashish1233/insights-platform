@@ -6,13 +6,18 @@ import {
   SectionHeader,
   Text,
 } from '@insights-platform/ui-kit';
-import { APPS, appsForTenant, matchesQuery, tenants } from '../registry/apps';
+import { matchesQuery, visibleTo } from '../registry/apps';
 import type { RegisteredApp } from '../registry/apps';
 import { AppCard } from './AppCard';
 
 export interface AppDirectoryProps {
   /** The signed-in user's tenant. Their apps lead the page. */
   homeTenant: string;
+  /**
+   * The signed-in user's scopes. The directory shows only apps they hold the
+   * required scope for — the filtering ADR-2's composition argument depends on.
+   */
+  scopes: readonly string[];
   onOpened: (appId: string) => void;
 }
 
@@ -37,23 +42,30 @@ export interface AppDirectoryProps {
  * fallback, which is why the field sits in the section header rather than
  * below it.
  */
-export function AppDirectory({ homeTenant, onOpened }: AppDirectoryProps) {
+export function AppDirectory({ homeTenant, scopes, onOpened }: AppDirectoryProps) {
   const [query, setQuery] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const mine = useMemo(() => appsForTenant(homeTenant), [homeTenant]);
+  // Everything below is derived from what this user may see, never from the
+  // full registry. An app they lack the scope for is absent, not greyed out.
+  const visible = useMemo(() => visibleTo(scopes), [scopes]);
+
+  const mine = useMemo(
+    () => visible.filter((app) => app.tenant === homeTenant),
+    [visible, homeTenant],
+  );
   const others = useMemo(
-    () => APPS.filter((app) => app.tenant !== homeTenant),
-    [homeTenant],
+    () => visible.filter((app) => app.tenant !== homeTenant),
+    [visible, homeTenant],
   );
   const otherTenantCount = useMemo(
-    () => tenants().filter((tenant) => tenant !== homeTenant).length,
-    [homeTenant],
+    () => new Set(others.map((app) => app.tenant)).size,
+    [others],
   );
 
   const results = useMemo(
-    () => (query.trim() ? APPS.filter((app) => matchesQuery(app, query)) : []),
-    [query],
+    () => (query.trim() ? visible.filter((app) => matchesQuery(app, query)) : []),
+    [visible, query],
   );
 
   /*
@@ -89,7 +101,7 @@ export function AppDirectory({ homeTenant, onOpened }: AppDirectoryProps) {
         as="h2"
         id="directory-heading"
         title="Applications"
-        meta={`${APPS.length} across ${tenants().length} tenants`}
+        meta={`${visible.length} across ${new Set(visible.map((a) => a.tenant)).size} tenants`}
         actions={
           <div className="shell-search">
             <Input

@@ -51,7 +51,7 @@ apps:
     #
     # They run on a service identity whose scopes come from the IdP's
     # (tenant, service) registry — never from the caller, and never borrowed
-    # from a user (ADR-1).
+    # from a user (ADR-2).
     service_principal: spend-export
     schedule: "0 2 * * *"
     required_scopes: [insights:read, export:run]

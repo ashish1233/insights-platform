@@ -64,8 +64,10 @@ bootstrap() {
     (cd "$dir" && uv venv -q .venv \
        && uv pip install -q --python .venv/bin/python -e ".[dev]")
   else
+    # pytest too, so `uv run pytest` works in a tenant repo straight after this.
     (cd "$dir" && uv venv -q .venv \
-       && uv pip install -q --python .venv/bin/python -e "$SDK" -e .)
+       && uv pip install -q --python .venv/bin/python -e "$SDK" -e . \
+            pytest pytest-asyncio)
   fi \
     && echo "done" || { echo "FAILED"; exit 1; }
 }
@@ -134,7 +136,7 @@ say "ADR-3 — authentication is a runtime gate"
 [[ "$(status -H 'Authorization: Bearer garbage' localhost:8000/api/insights)" == 401 ]] \
   && ok "a malformed token is 401, not 500" || bad "malformed token did not return 401"
 
-say "ADR-2 — the restricted tier enforces scope, whatever the route does"
+say "ADR-2 — the restricted tier enforces scope in middleware"
 NO_SCOPE=$(mint '{"tenant_id":"people-analytics","subject":"alice@corp","scopes":["insights:read"]}')
 [[ "$(status -H "Authorization: Bearer $NO_SCOPE" localhost:8000/api/insights)" == 403 ]] \
   && ok "without insights:read_sensitive the request is refused" \

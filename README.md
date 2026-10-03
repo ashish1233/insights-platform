@@ -28,7 +28,7 @@ cannot be walked back.
 
 ## Run it
 
-**One command, and it checks every claim these ADRs make:**
+**One command, and it checks the runtime guarantees these ADRs make:**
 
 ```bash
 ./scripts/verify-guarantees.sh
@@ -37,7 +37,7 @@ cannot be walked back.
 It starts the stubbed identity provider, warehouse and audit sink, brings up the
 restricted-tier app, and then verifies each guarantee against the running
 system — a malformed token returns 401 rather than 500, a caller without
-`insights:read_sensitive` is refused even though the route never checks, a
+`insights:read_sensitive` is refused by middleware before the route body runs, a
 token issued for one tenant is rejected by another's app, the audit sink refuses
 DELETE, the scheduled job runs as a service identity rather than a borrowed
 user, and the restricted tier returns 503 rather than serving data it cannot
@@ -131,7 +131,7 @@ independent lifecycle. Reasoning in
 | Where do platform rules live, and how did you decide? | [ADR-3](docs/adr/0003-where-platform-rules-are-enforced.md) — a rule sits at the cheapest layer where its failure is still recoverable. Three runtime gates, deliberately no more. |
 | What do tenants share, and what facts drew that line? | [ADR-2](docs/adr/0002-tiered-tenant-isolation.md) — tenants are employee teams with organizational recourse, so the threat model is carelessness, not malice. That makes soft isolation correct by default and People Analytics the exception. |
 | What can the platform team see and do, and how is that constrained and evidenced? | [ADR-4](docs/adr/0004-operator-access-and-break-glass.md) — metadata by default, break-glass with a second approver for raw data, audit store the platform team cannot edit. |
-| What did you consciously leave out? | [ADR-5](docs/adr/0005-deliberate-omissions.md) — seven omissions, each with a trigger someone could actually check. |
+| What did you consciously leave out? | [ADR-5](docs/adr/0005-deliberate-omissions.md) — eight omissions, each with a trigger someone could actually check. |
 
 One question the brief didn't ask, but twenty-five tenants raise on their own:
 **how do twenty-five apps become one product rather than twenty-five bookmarks?**

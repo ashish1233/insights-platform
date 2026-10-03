@@ -30,7 +30,7 @@ export const SCOPES = ['insights:read'];
  * The SDK version the platform currently ships.
  *
  * Hardcoded, and that is a known wart: it duplicates
- * `packages/sdk-python/pyproject.toml` and will go stale the first time nobody
+ * `insights-sdk-python/pyproject.toml` and will go stale the first time nobody
  * remembers. It belongs in the registry response the platform serves, next to
  * the app list, where one deploy updates both.
  */

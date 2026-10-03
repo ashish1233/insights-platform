@@ -4,8 +4,8 @@ The scaffold for an interactive insight app. Copy this directory into your own
 repository, work through the `TODO(team)` markers, and delete this heading.
 
 This is a **paved road, not a framework**. After you copy it, you own it. The
-platform team owns the SDK underneath it and will open pull requests against
-your repository when it changes (ADR-1) — merge them.
+platform team publishes the SDK; you take a new release when you want what is
+in it (ADR-1). We never open pull requests in your repository.
 
 ## Day one
 
@@ -53,7 +53,7 @@ runs per request. Declaring without checking serves your data to every
 authenticated caller, so write both.
 
 **The tier in `.env` and the tier in production.** Tier is assigned by the
-platform team, not chosen (ADR-2, ADR-5 item 7). Setting `INSIGHTS_TIER=restricted`
+platform team, not chosen (ADR-2, ADR-5 item 8). Setting `INSIGHTS_TIER=restricted`
 locally makes your own app stricter with itself; it does not give you
 restricted-tier warehouse grants or the fail-closed audit path.
 
@@ -85,8 +85,7 @@ The `Dockerfile` runs as a non-root user (uid 10001) on port 8000 and declares a
 `HEALTHCHECK` against the platform health endpoint. Configuration arrives as
 environment variables; the container writes nothing to disk.
 
-There is no staging environment (ADR-5 item 4). Local development and production
-are what exist. Upgrade pull requests arrive with the migration already applied,
-but **you merge them** — test however you normally would, because the platform
-team can confirm the SDK still works and cannot confirm your numbers are still
-right.
+There is no staging environment (ADR-5 item 5). Local development and production
+are what exist. Releases ship with a migration guide, but **you decide when to
+take one** — test however you normally would, because the platform team can
+confirm the SDK still works and cannot confirm your numbers are still right.

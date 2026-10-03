@@ -67,7 +67,7 @@ in the root README's "what I'd do next", because it turns onboarding into
 both created by hand. A manifest records intent and makes drift reviewable; it
 does not prevent drift.
 
-That gap is ADR-5 item 2, and it is named there as the weakest point in the
+That gap is ADR-5 item 3, and it is named there as the weakest point in the
 design — the isolation guarantee in ADR-2 rests on warehouse grants that no
 automated process verifies. The first thing worth building is not a provisioner
 but a checker: a read-only job that diffs actual grants against what these files

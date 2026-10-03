@@ -47,9 +47,13 @@ whole of it: the directory says who you are, the platform says what you may do.
 - **Each app declares the scopes it defines** in its tenant manifest — what they mean, and
   which data they unlock.
 - **The app owner grants and revokes them**, themselves, in the platform. No ticket, no
-  intermediary, effective immediately.
-- **The platform mints tokens carrying those scopes** and enforces them at runtime. A client
-  never names its own scopes.
+  intermediary, effective immediately. *(Designed, not built — see ADR-5. Today the stub
+  identity provider accepts the scopes a caller asks for, which is how the tier behaviour is
+  demonstrated and is explicitly not the production shape.)*
+- **The platform mints tokens carrying those scopes** and enforces them at runtime; a client
+  does not name its own. *(Enforcement is real — middleware refuses a caller lacking the
+  declared scope. Issuance is not: the stub IdP takes the caller's word, and says so in its
+  own docstring.)*
 - **Every grant, revocation and use lands in the same audit store** (ADR-4). "Who authorised
   this, and who then used it" is one query against one system.
 - **Service identities** for scheduled jobs are granted the same way, by the same owner, and

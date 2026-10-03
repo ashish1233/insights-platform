@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Micro-frontend host for the Insights Hub. Federates standard-tier apps; links out to restricted-tier ones (ADR-6).",
+  "description": "Micro-frontend host for the Insights Hub. Federates standard-tier apps; links out to restricted-tier ones (ADR-2).",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
