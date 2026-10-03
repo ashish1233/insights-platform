@@ -26,6 +26,25 @@ cannot be walked back.
 
 ---
 
+## Getting the code
+
+The platform is six repositories that expect to sit **side by side in one
+directory** — the SDK and UI kit are consumed by relative path so everything is
+editable at once without publishing to a registry first.
+
+```bash
+mkdir insights-hub && cd insights-hub
+for r in insights-platform insights-sdk-python insights-ui-kit \
+         people-analytics-dashboard finance-spend-explorer finance-spend-export; do
+  git clone https://github.com/ashish1233/$r.git
+done
+```
+
+You need `uv`, Node 18+, and nothing else. No cloud account, no real SSO, no
+database — every piece of infrastructure here is stubbed.
+
+---
+
 ## Run it
 
 **One command, and it checks the runtime guarantees these ADRs make:**
