@@ -96,7 +96,7 @@ export const ANNOUNCEMENTS: readonly Announcement[] = [
     tone: 'attention',
     link: {
       label: 'Migration runbook and exact timings',
-      href: 'https://github.com/example/insights-platform/blob/main/docs/runbooks/warehouse-migration.md',
+      href: 'https://github.com/ashish1233/insights-platform/blob/main/docs/runbooks/warehouse-migration.md',
     },
   },
   {
@@ -109,7 +109,7 @@ export const ANNOUNCEMENTS: readonly Announcement[] = [
     tone: 'neutral',
     link: {
       label: 'Request access for your tenant',
-      href: 'https://github.com/example/insights-platform/blob/main/ONBOARDING.md',
+      href: 'https://github.com/ashish1233/insights-platform/blob/main/ONBOARDING.md',
     },
   },
   {
@@ -122,7 +122,7 @@ export const ANNOUNCEMENTS: readonly Announcement[] = [
     tone: 'neutral',
     link: {
       label: 'Read the retrospective',
-      href: 'https://github.com/example/insights-platform/blob/main/docs/incidents/2026-09-16-identity.md',
+      href: 'https://github.com/ashish1233/insights-platform/blob/main/docs/incidents/2026-09-16-identity.md',
     },
   },
   {
@@ -135,7 +135,7 @@ export const ANNOUNCEMENTS: readonly Announcement[] = [
     tone: 'attention',
     link: {
       label: 'SDK 0.4 release notes',
-      href: 'https://github.com/example/insights-sdk-python',
+      href: 'https://github.com/ashish1233/insights-sdk-python',
     },
   },
 ];

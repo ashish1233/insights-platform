@@ -38,10 +38,10 @@ export const PLATFORM_SDK_VERSION = '0.1.0';
 
 /** Where a team that has never shipped on the platform should go first. */
 export const ONBOARDING_DOC_URL =
-  'https://github.com/example/insights-platform/blob/main/ONBOARDING.md';
+  'https://github.com/ashish1233/insights-platform/blob/main/ONBOARDING.md';
 
 export const TEMPLATE_WEB_URL =
-  'https://github.com/example/insights-platform/tree/main/templates/web';
+  'https://github.com/ashish1233/insights-platform/tree/main/templates/web';
 
 export const TEMPLATE_JOB_URL =
-  'https://github.com/example/insights-platform/tree/main/templates/job';
+  'https://github.com/ashish1233/insights-platform/tree/main/templates/job';
