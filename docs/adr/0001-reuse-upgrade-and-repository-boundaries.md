@@ -65,6 +65,17 @@ reach, but the thing it guards is infrastructure we own. Depending on the hole, 
 The bug is still present in twelve apps. It has stopped mattering. This takes minutes and
 needs nobody's cooperation, because every one of these levers is on our side of the line.
 
+**One honest dependency.** The first of those levers leans on the per-tenant warehouse
+grants, and ADR-5 names those as the weakest point in the whole design — created by hand,
+verified by nothing. So the incident response and the standing isolation guarantee rest on
+the same unchecked thing, which means a grant that is quietly wrong costs us twice: the
+backstop is not there, and neither is the containment.
+
+That does not change the decision — rotating the signing secret and withdrawing the scope are
+independent of it, and either alone shortens the exposure window dramatically. But it does
+move grant-drift detection from "worth doing" to the first thing on the list, which is where
+the root README puts it.
+
 **Step two, the actual fix.** We publish the patched version with a severity, a description
 of the exposure, and a deadline, and notify each affected team directly rather than relying
 on them watching a feed. They upgrade and test on their own terms.
