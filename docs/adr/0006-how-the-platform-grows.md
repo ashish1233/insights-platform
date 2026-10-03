@@ -2,9 +2,9 @@
 
 **Status:** Accepted · **Date:** 2026-10-03
 
-> **In short.** Three engineers cannot build every capability twenty-five teams
-> will want, and letting each team build their own recreates the duplication the
-> platform exists to end. So the SDK has **explicit extension points**, anything a
+> **In short.** A platform whose growth runs through its own team has a ceiling;
+> one where capability arrives *from* the teams using it does not. So the SDK has
+> **explicit extension points**, anything a
 > tenant builds starts in their own repository, and it is promoted into the
 > platform only when a **second tenant needs it** — the same "two independent
 > occurrences" trigger ADR-5 uses elsewhere. One invariant holds regardless of who
@@ -21,16 +21,28 @@ A warehouse connector for a source we do not support. A different export format.
 Natural-language querying over their dataset. An agent that reads from the
 warehouse on a schedule. Something nobody has thought of yet.
 
-There are only three places that capability can come from, and all three are bad
-in different ways:
+**This is the question that decides whether the platform keeps compounding.** Up
+to now every capability has come from the platform team, which works beautifully
+at five tenants and sets a ceiling at twenty-five: the platform can only grow as
+fast as three people can write code, and every accepted request is a permanent
+obligation that slows the next one.
 
-- **The platform team builds it.** Does not scale past a handful of requests, and
-  every one is a permanent maintenance obligation for three people.
-- **Each team builds their own.** Recreates exactly the duplication the platform
-  exists to end — five teams writing five slightly different exporters.
-- **Teams contribute to the platform.** Scales, but means code twenty-five apps
-  depend on is written by people who do not carry the pager for it, reviewed by a
-  team that does not have review capacity (ADR-3).
+The way past that ceiling is to make the teams themselves a source of capability.
+Twenty-five teams is twenty-five times the engineering capacity of the platform
+team — the whole design question is how to let that capacity reach shared code
+without losing the coherence that made it worth sharing.
+
+Three routes, each with a real cost:
+
+- **The platform team builds it.** Highest quality and tightest fit. Bounded by
+  one team's throughput, and every yes narrows the next one.
+- **Each team builds their own.** Fastest for them, unbounded in aggregate —
+  and recreates exactly the duplication the platform exists to end.
+- **Teams contribute to shared code.** The only route that compounds. Costs
+  review capacity the platform team does not have (ADR-3), and puts code
+  twenty-five apps depend on in the hands of people who do not carry its pager.
+
+We take the third, with the costs priced in rather than wished away.
 
 ## Decision
 
@@ -106,7 +118,7 @@ they were never holding.
 
 | Option | Why not |
 |---|---|
-| Platform team builds every requested capability | The obvious answer and the one that kills small platform teams. Every accepted request is permanent, and the queue only grows |
+| Platform team builds every requested capability | Highest quality, and the model that works today. Rejected because it makes platform throughput the ceiling on tenant capability — the platform would stay excellent and stop compounding |
 | Let tenants fork the SDK | Fast for them, and it ends the platform — twelve divergent copies, no upgrade path, and ADR-1's whole model gone |
 | Open contribution with review | Tempting, and it is what large platforms do. Rejected because ADR-3 already concluded three engineers cannot review twenty-five teams' code; a contribution queue is the same bottleneck wearing a different hat |
 | Promote on the author's say-so | Faster than waiting for a second tenant, and it fills the platform with one-team abstractions that nobody else fits. The second tenant is the cheapest available evidence that a thing is general |
