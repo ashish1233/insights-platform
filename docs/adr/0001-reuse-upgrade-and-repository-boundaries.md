@@ -85,9 +85,22 @@ operate; it fails in the tenant's own CI where they can see it. The services we 
 authenticated keeps serving if they are down.
 
 **Pull over push, because push does not scale and does not help.** An earlier draft had the
-platform team open an upgrade PR in every tenant repository. That is work growing linearly
-with tenant count — the exact cost this design exists to avoid — and at fifty apps three
-engineers cannot author migrations against codebases they have never read.
+platform team open an upgrade PR in every tenant repository. Three problems with that.
+
+**It is not what these three people are for.** A platform team of two or three exists to
+build and support the substrate. Spending their week editing other teams' application code
+is the clearest possible sign the platform has stopped being a platform and become a shared
+services desk — and the work only grows, by one more repository every time someone joins.
+
+**They do not know those codebases.** At twenty-five apps, let alone fifty, nobody on the
+platform team has read most of them. Authoring a migration against code you have never seen,
+for a domain you do not understand, is not help.
+
+**And it moves the blast radius to the worst possible place.** An upgrade can change
+behaviour in ways that compile cleanly — a column that now returns null instead of being
+omitted, a rounding change, a different default. Touching twenty-five repositories means one
+mistake lands in twenty-five production apps at once, authored by someone who cannot tell
+which of the resulting numbers are wrong.
 
 **And we could not safely merge them anyway.** A platform engineer can verify that a
 migration compiles and that our tests pass. They cannot verify that a tenant's quarterly
